@@ -1,0 +1,18 @@
+# Environnement virtuel
+venv/
+
+# Fichiers Python temporaires
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# BDD locale
+smartshop.db
+
+# Images uploadées
+uploads/
+
+# Configs locales
+.env
+*.log
