@@ -60,20 +60,26 @@ def api_delete_product(pid):
 
 
 @api.post("/upload_image")
-def upload_image():
-    print("Content-Type:", request.content_type)
-    print("request.files keys:", list(request.files.keys()))
+def api_upload_image():
+    if "image" not in request.files:
+        return jsonify({"message": "no file"}), 400
 
-    file = request.files.get("image")
-    if file is None or file.filename == "":
-        return jsonify({"message": "no file uploaded"}), 400
+    file = request.files["image"]
 
-    filename = secure_filename(f"{uuid4().hex}_{file.filename}")
+    if file.filename == "":
+        return jsonify({"message": "empty filename"}), 400
+
+    filename = secure_filename(file.filename)
+    unique_name = f"{uuid4().hex}_{filename}"
 
     upload_folder = current_app.config["UPLOAD_FOLDER"]
-    filepath = os.path.join(upload_folder, filename)
-    file.save(filepath)
+    os.makedirs(upload_folder, exist_ok=True)
 
-    file_url = url_for("uploaded_file", filename=filename, _external=True)
+    save_path = os.path.join(upload_folder, unique_name)
+    file.save(save_path)
 
-    return jsonify({"url": file_url}), 201
+
+    return jsonify({
+        "filename": unique_name,
+        "path": f"/uploads/{unique_name}"
+    }), 201
